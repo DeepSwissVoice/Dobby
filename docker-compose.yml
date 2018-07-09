@@ -1,0 +1,8 @@
+version: "3"
+
+services:
+  dobby:
+    image: dobby
+    build: .
+    container_name: Dobby
+    restart: always

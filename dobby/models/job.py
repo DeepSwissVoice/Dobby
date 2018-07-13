@@ -17,8 +17,12 @@ class Job:
         self.jobname = jobname
         self.slave = slave
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         return f"<Job {self.jobid}>"
+
+    @classmethod
+    def load(cls, task: "Task", jobname: str, config) -> "Job":
+        return cls(task, jobname, None)
 
     @property
     def jobid(self) -> str:

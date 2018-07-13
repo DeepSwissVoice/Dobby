@@ -22,11 +22,13 @@ class Dobby:
         config = Config.load(fp)
 
         tasks = []
-        for task in config.tasks.items():
-            tasks.append(Task(*task))
+        for taskid, task_config in config.tasks.items():
+            if task_config.get("enabled", True):
+                tasks.append(Task.load(taskid, task_config))
+            else:
+                log.debug(f"Task {taskid} disabled!")
 
         return cls(config, tasks)
 
     def run(self):
         log.info("start")
-        print(self.tasks)

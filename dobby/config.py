@@ -70,6 +70,6 @@ class Config(UserDict):
     def load(cls, fp: TextIO) -> "Config":
         config = yaml.load(fp)
         env = Environment(config.pop("env", None))
-        tasks = config.pop("tasks", DictContainer(env))
+        tasks = DictContainer(env, config.pop("tasks", {}))
         data = DictContainer(env, config)
         return cls(env, tasks, data)

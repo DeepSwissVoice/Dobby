@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import Any, Dict, List
 
 from .job import Job
 
@@ -16,6 +16,10 @@ class Task:
 
     def __str__(self) -> str:
         return f"<Task {self.taskid}>"
+
+    @classmethod
+    def load(cls, taskid: str, config: Dict[str, Any]) -> "Task":
+        return cls(taskid)
 
     def execute(self):
         log.info(f"{self} running {len(self.jobs)} jobs")

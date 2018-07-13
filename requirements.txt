@@ -6,5 +6,6 @@ colorlog==3.1.4
 idna==2.7
 pymongo==3.7.0
 pyyaml==3.13
+raven==6.9.0
 requests==2.19.1
 urllib3==1.23; python_version != '3.0.*'

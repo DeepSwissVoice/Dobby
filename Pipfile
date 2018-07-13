@@ -15,4 +15,5 @@ colorlog = "*"
 "discord.py" = { file = "https://github.com/Rapptz/discord.py/archive/rewrite.zip", ref = "1.0.0a" }
 pyyaml = "*"
 pymongo = "*"
+raven = "*"
 requests = "*"

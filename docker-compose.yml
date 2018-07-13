@@ -6,3 +6,5 @@ services:
     build: .
     container_name: Dobby
     restart: always
+    environment:
+      - SENTRY_DSN

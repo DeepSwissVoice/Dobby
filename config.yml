@@ -1,0 +1,24 @@
+env:
+  STATISTICS_URL: https://swiss-voice.ch/api/stats
+
+tasks:
+  statistics:
+    run: weekly
+    job:
+      slave:  dobby.get_url
+      url:    $STATISTICS_URL
+
+  trial:
+    run: monthly
+    jobs:
+      texts:
+        enabled:    no
+        slave:      dobby.mongodb.move_documents
+        database:   SwissVoice
+        from_coll:  proposed_texts
+        to_coll:    texts
+        condition:
+
+  zip:
+    run: monthly
+    job: dobby.custom.zip

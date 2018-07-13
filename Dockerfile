@@ -3,12 +3,12 @@ FROM python:alpine
 # META
 LABEL maintainer="Simon (siku2)"
 
-# EXPOSING
-VOLUME /dobby/config.yml
-
 # PREREQUISITES
 RUN apk add --no-cache bash
-RUN pip install pipenv 2>&1
+RUN pip install pipenv
+RUN pip install https://github.com/Supervisor/supervisor/archive/master.zip
+
+WORKDIR /dobby
 
 # INSTALL
 COPY Pipfile ./
@@ -16,9 +16,10 @@ COPY Pipfile.lock ./
 RUN pipenv install
 
 # SETUP
-COPY dobby /dobby
-COPY config.yml /dobby/_config.yml
-COPY entrypoint.sh /dobby/entrypoint.sh
+COPY dobby dobby
+COPY config.yml ./_config.yml
+COPY .docker/entrypoint.sh ./
+COPY .docker/supervisord.conf /etc/
 
 # RUN
-ENTRYPOINT ["/dobby/entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]

@@ -41,7 +41,7 @@ def find_preset(key: str) -> Optional[dict]:
     return next((value for keys, value in PRESETS if key in keys), None)
 
 
-def set_datetime(dt: datetime, month_anchor: bool, **changes) -> datetime:
+def set_datetime_prop(dt: datetime, month_anchor: bool, **changes) -> datetime:
     day = changes.pop("day", None)
     if day is not None:
         if month_anchor:
@@ -56,13 +56,13 @@ def set_datetime(dt: datetime, month_anchor: bool, **changes) -> datetime:
 
     week = changes.pop("week", None)
     if week is not None:
-        diff = week - get_datetime_property(dt, month_anchor, "week")
+        diff = week - get_datetime_prop(dt, month_anchor, "week")
         dt = dt + timedelta(weeks=diff)
 
     return dt.replace(**changes)
 
 
-def get_datetime_property(dt: datetime, month_anchor: bool, prop: str) -> int:
+def get_datetime_prop(dt: datetime, month_anchor: bool, prop: str) -> int:
     if prop == "week":
         return dt.day // 7 + 1 if month_anchor else dt.isocalendar()[1]
     elif prop == "day":
@@ -74,6 +74,7 @@ def get_datetime_property(dt: datetime, month_anchor: bool, prop: str) -> int:
 
 
 class Calendar:
+    month_anchor: bool
     year: IntervalValue
     month: Optional[IntervalValue]
     week: Optional[IntervalValue]
@@ -143,16 +144,16 @@ class Calendar:
         for interval in reversed(INTERVALS):
             value = getattr(self, interval)
             if isinstance(value, EVERY):
-                current_value = get_datetime_property(next_time, self.month_anchor, interval)
+                current_value = get_datetime_prop(next_time, self.month_anchor, interval)
                 last_value = value.interval * (current_value // value.interval)
                 try:
-                    next_time = set_datetime(next_time, self.month_anchor, **{interval: last_value + value.interval})
+                    next_time = set_datetime_prop(next_time, self.month_anchor, **{interval: last_value + value.interval})
                 except ValueError:
-                    next_time = set_datetime(next_time, self.month_anchor, **{interval: value.interval})
+                    next_time = set_datetime_prop(next_time, self.month_anchor, **{interval: value.interval})
                 else:
                     break
             elif value is not None:
-                next_time = set_datetime(next_time, self.month_anchor, **{interval: value})
+                next_time = set_datetime_prop(next_time, self.month_anchor, **{interval: value})
                 if next_time > current:
                     break
 

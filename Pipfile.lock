@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "3ef1e2accae977fed7d1ec640ba297ca8f5f9dac29417d3342735c580697a03f"
+            "sha256": "2ba468791733cd46b6e15fd04de3f707bcba3a1f58b19b12546d5a0bf249f834"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -45,10 +45,6 @@
             ],
             "index": "pypi",
             "version": "==3.1.4"
-        },
-        "discord.py": {
-            "file": "https://github.com/Rapptz/discord.py/archive/rewrite.zip",
-            "ref": "1.0.0a"
         },
         "idna": {
             "hashes": [

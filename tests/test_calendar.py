@@ -20,7 +20,7 @@ def test_config():
 
 def test_normal():
     dt = datetime(2018, 7, 13, 11, 58, 5)
-    assert Calendar(month=EVERY(), day=15).next_event(dt) == datetime(2018, 7, 15)
+    assert Calendar(month=EVERY(), day=15).next_event(dt) == datetime(2018, 7, 16)
     assert Calendar(year=EVERY(2), week=EVERY(2), day=1).next_event(dt) == datetime(2018, 7, 24)
     assert Calendar().next_event(dt) == datetime(2018, 7, 13, 11, 58, 6)
 

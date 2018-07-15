@@ -19,13 +19,25 @@ tasks:
   trial:
     run: monthly
     jobs:
-      texts:
-        enabled:    no
+      accept_texts:
         slave:      dobby.mongodb.move_documents
         database:   SwissVoice
         from_coll:  proposed_texts
         to_coll:    texts
         condition:
+          votes: {$gte: 10}
+          $expr: {$gte: [{$divide:["$balance", "$votes"]}, .8]}
+      reject_texts:
+        slave:      dobby.mongodb.delete_documents
+        database:   SwissVoice
+        from_coll:  proposed_texts
+        condition:
+          $or:
+            - {
+                votes: {$gte: 10},
+                $expr: {$lt: [{$divide:["$balance", "$votes"]}, .5]}
+              }
+            - { votes: {$gt: 25} }
 
   zip:
     run: monthly

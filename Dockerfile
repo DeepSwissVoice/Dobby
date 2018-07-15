@@ -17,6 +17,7 @@ RUN pipenv install
 
 # SETUP
 COPY dobby dobby
+COPY ext/* ./
 COPY config.yml ./_config.yml
 COPY .docker/entrypoint.sh ./
 COPY .docker/supervisord.conf /etc/

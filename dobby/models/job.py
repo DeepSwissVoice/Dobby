@@ -18,11 +18,13 @@ class Job:
         self.slave = slave
 
     def __repr__(self) -> str:
-        return f"<Job {self.jobid}>"
+        return f"<Job {self.jobid} {self.slave}>"
 
     @classmethod
     def load(cls, task: "Task", jobname: str, config) -> "Job":
-        return cls(task, jobname, None)
+        slave_id = config["slave"]
+        slave = task.dobby.get_slave(slave_id)
+        return cls(task, jobname, slave)
 
     @property
     def jobid(self) -> str:

@@ -1,21 +1,26 @@
 import logging
 from datetime import datetime
-from typing import List
+from typing import List, TYPE_CHECKING
 
 from .calendar import Calendar
 from .context import Context
 from .job import Job
 from ..config import DictContainer
 
+if TYPE_CHECKING:
+    from .. import Dobby
+
 log = logging.getLogger(__name__)
 
 
 class Task:
+    dobby: "Dobby"
     taskid: str
     calendar: Calendar
     jobs: List[Job]
 
-    def __init__(self, taskid: str, calendar: Calendar, jobs: List[Job] = None):
+    def __init__(self, dobby: "Dobby", taskid: str, calendar: Calendar, jobs: List[Job] = None):
+        self.dobby = dobby
         self.taskid = taskid
         self.calendar = calendar
         self.jobs = jobs or []
@@ -24,9 +29,9 @@ class Task:
         return f"<Task {self.taskid} {self.calendar}>"
 
     @classmethod
-    def load(cls, taskid: str, config) -> "Task":
+    def load(cls, dobby: "Dobby", taskid: str, config) -> "Task":
         calendar = Calendar.from_config(config["run"])
-        inst = cls(taskid, calendar)
+        inst = cls(dobby, taskid, calendar)
 
         _job = config.get("job")
         _jobs = [("main", _job)] if _job else config.get("jobs", {}).items()

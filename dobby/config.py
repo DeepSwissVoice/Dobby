@@ -1,7 +1,8 @@
 import os
 from ast import literal_eval
 from collections import UserDict, UserList
-from typing import Any, TextIO
+from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -60,16 +61,26 @@ class Environment(DictContainer):
 
 class Config(UserDict):
     env: Environment
+    ext: ListContainer
+    tasks: DictContainer
 
-    def __init__(self, env: Environment, tasks: DictContainer, data: DictContainer):
+    def __init__(self, env: Environment, ext: ListContainer, tasks: DictContainer, data: DictContainer):
         self.env = env
+        self.ext = ext
         self.tasks = tasks
         super().__init__(data)
 
     @classmethod
-    def load(cls, fp: TextIO) -> "Config":
+    def load(cls, fp: Path) -> "Config":
         config = yaml.load(fp)
         env = Environment(config.pop("env", None))
+
+        _ext = config.pop("ext", [])
+        if isinstance(_ext, str):
+            _ext = [_ext]
+        ext = ListContainer(env, _ext)
+
         tasks = DictContainer(env, config.pop("tasks", {}))
         data = DictContainer(env, config)
-        return cls(env, tasks, data)
+
+        return cls(env, ext, tasks, data)

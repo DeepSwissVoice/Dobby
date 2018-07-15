@@ -9,9 +9,19 @@ def test_config():
         ("monthly", "[*y *m]"),
         ("weekly", "[*y *w]"),
         ("daily", "[*y *m *d]"),
-        ("hourly", "[*y *m *d *h]"),
-        ("minutely", "[*y *m *d *h *m]"),
-        ("secondly", "[*y *m *d *h *m *s]")
+        ("hourly", "[*y *m *d *H]"),
+        ("minutely", "[*y *m *d *H *M]"),
+        ("secondly", "[*y *m *d *H *M *S]")
+    ]
+    for config, result in tests:
+        print("config", config)
+        assert str(Calendar.from_config(config)) == result
+
+
+def test_repr():
+    tests = [
+        ("[*y @3m]", "[*y @3m]"),
+        ("*y *M", "[*y *m *d *H *M]")
     ]
     for config, result in tests:
         print("config", config)

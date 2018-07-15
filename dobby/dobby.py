@@ -43,12 +43,9 @@ class Dobby(GroupMixin):
 
     def run(self):
         log.info("start")
-        print(self.tasks, flush=True)
-        print([task.jobs for task in self.tasks], flush=True)
         while True:
             now = datetime.now()
             next_time = min(task.next_execution(now) for task in self.tasks)
-            print(next_time, flush=True)
             sleep_time = (next_time - now).total_seconds()
             log.debug(f"sleeping for {sleep_time} second(s)")
             time.sleep(sleep_time)

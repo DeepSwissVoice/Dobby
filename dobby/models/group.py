@@ -11,9 +11,8 @@ class GroupMixin(abc.ABC):
     slaves: Dict[str, Slave]
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
         self.slaves = {}
+        super().__init__(**kwargs)
 
     def add_slave(self, slave: Slave):
         key = slave.name
@@ -32,9 +31,6 @@ class GroupMixin(abc.ABC):
                 if member.parent is None:
                     self.add_slave(member)
                 continue
-
-            # if name.startswith("on_"):
-            #     self.add_listener(member, name)
 
     def load_ext(self, ext: str):
         ext = importlib.import_module(ext)
@@ -86,9 +82,7 @@ class GroupMixin(abc.ABC):
 
 
 class Group(GroupMixin, Slave):
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    pass
 
 
 def group(name=None, **kwargs) -> Callable[[Callable], Group]:

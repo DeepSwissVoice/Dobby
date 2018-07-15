@@ -72,7 +72,7 @@ class Config(UserDict):
 
     @classmethod
     def load(cls, fp: Path) -> "Config":
-        config = yaml.load(fp)
+        config = yaml.load(fp.read_text())
         env = Environment(config.pop("env", None))
 
         _ext = config.pop("ext", [])

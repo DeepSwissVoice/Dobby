@@ -12,23 +12,26 @@ class Job:
     jobname: str
     slave: Slave
 
-    def __init__(self, task: "Task", jobname: str, slave: Slave):
+    def __init__(self, task: "Task", jobname: str, slave: Slave, **args):
         self.task = task
         self.jobname = jobname
         self.slave = slave
+        self.args = args
 
     def __repr__(self) -> str:
         return f"<Job {self.jobid} {self.slave}>"
 
     @classmethod
     def load(cls, task: "Task", jobname: str, config) -> "Job":
-        slave_id = config["slave"]
+        slave_id = config.pop("slave")
         slave = task.dobby.get_slave(slave_id)
-        return cls(task, jobname, slave)
+        return cls(task, jobname, slave, **config)
 
     @property
     def jobid(self) -> str:
         return f"{self.task.taskid}-{self.jobname}"
 
     def run(self, ctx: Context):
-        self.slave.invoke(ctx)
+        args = []
+        kwargs = {}
+        ret = self.slave.invoke(ctx, *args, **kwargs)

@@ -24,7 +24,7 @@ def main():
     subparsers = parser.add_subparsers(title="commands")
 
     run_parser = subparsers.add_parser("run")
-    run_parser.add_argument("config_file", type=open)
+    run_parser.add_argument("config_file", type=Path)
     run_parser.set_defaults(func=run)
 
     args = parser.parse_args()

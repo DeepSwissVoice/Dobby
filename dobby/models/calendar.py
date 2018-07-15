@@ -1,14 +1,26 @@
+import re
 from datetime import datetime, timedelta
-from enum import Flag
-from typing import Optional, Union
+from enum import Enum, Flag
+from typing import Optional, Pattern, Union
 
 __all__ = ["EVERY", "Calendar", "Interval"]
 
 _DEFAULT = object()
+RE_PARSER: Pattern = re.compile(r"^(@?\d+|\*)([a-zA-Z])$")
 
 
 class Interval(Flag):
     START = 0
+
+
+class ReprMap(Enum):
+    year = "y"
+    month = "m"
+    week = "w"
+    day = "d"
+    hour = "H"
+    minute = "M"
+    second = "S"
 
 
 class EVERY:
@@ -83,15 +95,17 @@ class Calendar:
     minute: IntervalValue
     second: IntervalValue
 
-    def __init__(self, **intervals):
+    def __init__(self, **kwargs):
         _found_value = False
         _found_start = False
+
+        intervals = {key: value for key, value in kwargs.items() if key in INTERVALS}
 
         for interval in INTERVALS:
             value = 0
 
             if not _found_start:
-                val = intervals.get(interval, _DEFAULT)
+                val = intervals.pop(interval, _DEFAULT)
                 if val is not _DEFAULT:
                     if interval == "week":
                         self.month = None
@@ -100,13 +114,13 @@ class Calendar:
                         _found_start = True
                         value = EVERY()
                     else:
-                        _found_value = True
+                        if not intervals:
+                            _found_value = True
                         value = val
                 elif interval == "week":
                     value = None
                 elif not _found_value:
                     value = EVERY()
-
             setattr(self, interval, value)
 
         self.month_anchor = self.month is not None
@@ -125,18 +139,48 @@ class Calendar:
             else:
                 val = "@" + str(val)
 
-            int_details.append(val + interval[0])
+            int_details.append(val + ReprMap[interval].value)
 
         return "[" + " ".join(int_details) + "]"
 
     @classmethod
     def from_config(cls, config: Union[str, dict]) -> "Calendar":
         if isinstance(config, str):
-            preset = find_preset(config)
+            preset = find_preset(config.lower().replace(" ", "_"))
+
+            if not preset:
+                preset = Calendar.parse_repr(config)
+
             if preset:
                 return cls(**preset)
 
         raise NotImplementedError
+
+    @staticmethod
+    def parse_repr(rep: str) -> dict:
+        rep = rep.strip("[] ")
+        parts = rep.split()
+        data = {}
+
+        for part in parts:
+            match = RE_PARSER.match(part)
+            if not match:
+                raise Exception(f"Couldn't parse part {part} of {rep}")
+
+            spec, field_name = match.groups()
+            if spec == "*":
+                val = EVERY()
+            elif spec.startswith("@"):
+                val = int(spec[1:])
+            elif spec.isnumeric():
+                val = EVERY(int(spec))
+            else:
+                raise Exception(f"Couldn't interpret {spec} in {part} of {rep}")
+
+            field = ReprMap(field_name).name
+            data[field] = val
+
+        return data
 
     def next_event(self, current: datetime) -> datetime:
         next_time = current.replace(microsecond=0)

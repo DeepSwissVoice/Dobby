@@ -1,5 +1,4 @@
 import logging
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 from .. import Group
@@ -12,7 +11,7 @@ log = logging.getLogger(__name__)
 
 group = Group(name="dobby")
 
-exts = find_extensions(Path(__file__))
+exts = find_extensions(__file__, __package__)
 for ext in exts:
     log.debug(f"adding extension {ext}")
     ext.setup(group)

@@ -15,13 +15,14 @@ def setup_sentry():
     logging.getLogger(__package__).addHandler(handler)
 
 
-def find_extensions(file: Path) -> list:
+def find_extensions(fp: str, pkg: str) -> list:
+    file = Path(fp)
     exts = []
     for child in file.parent.iterdir():
         if child == file:
             continue
-        import_name = ".".join((*child.parts[:-1], child.stem))
-        mod = importlib.import_module(import_name)
+        import_name = "." + child.stem
+        mod = importlib.import_module(import_name, pkg)
         if hasattr(mod, "setup"):
             exts.append(mod)
     return exts

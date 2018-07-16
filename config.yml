@@ -1,0 +1,41 @@
+ext: ext.swissvoice
+
+env:
+  STATISTICS_URL: https://swiss-voice.ch/api/stats
+
+tasks:
+  statistics:
+    run: weekly
+    job:
+      slave:  dobby.get_url
+      url:    $STATISTICS_URL
+
+  trial:
+    run: monthly
+    jobs:
+      accept_texts:
+        slave:      dobby.mongodb.move_documents
+        database:   $SWISSVOICE_DB_URI
+        from_coll:  proposed_texts
+        to_coll:    texts
+        condition:
+          votes: { $gte: 10 }
+          $expr: { $gte: [{ $divide: ["$balance", "$votes"] }, .8] }
+        projection:
+          - region
+          - text
+      reject_texts:
+        slave:      dobby.mongodb.remove_documents
+        database:   $SWISSVOICE_DB_URI
+        from_coll:  proposed_texts
+        condition:
+          $or:
+            - {
+                votes: { $gte: 10 },
+                $expr: { $lt: [{ $divide: ["$balance", "$votes"] }, .5] }
+              }
+            - { votes: { $gt: 25 } }
+
+  zip:
+    run: monthly
+    job: swissvoice.zip

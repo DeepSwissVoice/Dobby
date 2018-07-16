@@ -33,7 +33,7 @@ class ListContainer(UserList):
 
 class DictContainer(UserDict):
     __class__ = dict
-    
+
     env: "Environment"
     data: dict
 

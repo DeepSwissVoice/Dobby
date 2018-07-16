@@ -26,7 +26,7 @@ class GroupMixin(abc.ABC):
 
     def add_ext(self, ext):
         members = inspect.getmembers(ext)
-        for name, member in members:
+        for _, member in members:
             if isinstance(member, Slave):
                 if member.parent is None:
                     self.add_slave(member)

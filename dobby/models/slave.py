@@ -1,7 +1,7 @@
 import inspect
 import logging
 from inspect import Parameter
-from typing import Any, Callable, Dict, Optional, Type, TypeVar, Union, _GenericAlias
+from typing import Any, Callable, Dict, Optional, Type, TypeVar, Union
 
 from .context import Context
 from .converter import CONVERTER_MAP, Converter
@@ -10,8 +10,9 @@ log = logging.getLogger(__name__)
 
 
 def convert(converter, arg, **kwargs):
-    if isinstance(converter, _GenericAlias):
-        if getattr(converter, "__origin__") is Union:
+    origin = getattr(converter, "__origin__", False)
+    if origin:
+        if origin is Union:
             types = getattr(converter, "__args__")
             if isinstance(arg, types):
                 return arg

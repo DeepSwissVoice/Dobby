@@ -43,7 +43,7 @@ def getitem(env: "Environment", value: Any) -> Any:
         return DictContainer(env, value)
     elif isinstance(value, str):
         if value.startswith("$"):
-            return env.get(value[1:])
+            return env[value[1:]]
     return value
 
 
@@ -56,7 +56,10 @@ class Environment(DictContainer):
         if value is not _DEFAULT:
             value = literal_eval(value)
             return getitem(self, value)
-        return super().__getitem__(item)
+        try:
+            return super().__getitem__(item)
+        except KeyError:
+            raise KeyError(f"Environment is missing \"{item}\" which is required!")
 
 
 class Config(UserDict):
@@ -75,7 +78,7 @@ class Config(UserDict):
         config = yaml.load(fp.read_text())
         env = Environment(config.pop("env", None))
 
-        _ext = config.pop("ext", [])
+        _ext = config.pop("ext", None)
         if isinstance(_ext, str):
             _ext = [_ext]
         ext = ListContainer(env, _ext)

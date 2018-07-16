@@ -8,4 +8,4 @@ services:
     restart: always
     environment:
       - SENTRY_DSN
-      - SwissVoice
+      - SWISSVOICE_DB_URI

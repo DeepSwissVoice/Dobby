@@ -82,7 +82,7 @@ class Slave:
                 arg = input_args.pop(name)
                 value = transform_param(param, arg, arguments=arguments, slave=self)
             elif required:
-                raise KeyError(f"{self} requires {name} arguments but it wasn't provided'")
+                raise KeyError(f"{self} requires \"{name}\" argument but it wasn't provided'")
             else:
                 value = param.default
             kwargs[name] = value

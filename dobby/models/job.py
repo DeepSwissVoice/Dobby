@@ -27,7 +27,7 @@ class Job:
         self.prepare()
 
     def __repr__(self) -> str:
-        return f"<Job {self.jobid} {self.slave}>"
+        return f"<Job {self.jobid} >>{self.slave.qualified_name}>"
 
     @classmethod
     def load(cls, task: "Task", jobname: str, config) -> "Job":
@@ -48,4 +48,4 @@ class Job:
         ctx.input_args = self.raw_kwargs
         ctx.kwargs = self.kwargs
         ctx = self.slave.invoke(ctx)
-        print(ctx)
+        log.info(f"{self} returned {ctx.result}")

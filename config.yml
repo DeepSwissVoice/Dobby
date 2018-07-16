@@ -5,7 +5,7 @@ env:
 
 tasks:
   statistics:
-    run: every minute
+    run: weekly
     job:
       slave:  dobby.get_url
       url:    $STATISTICS_URL
@@ -21,6 +21,9 @@ tasks:
         condition:
           votes: { $gte: 10 }
           $expr: { $gte: [{ $divide: ["$balance", "$votes"] }, .8] }
+        projection:
+          - region
+          - text
       reject_texts:
         slave:      dobby.mongodb.remove_documents
         database:   $SWISSVOICE_DB_URI

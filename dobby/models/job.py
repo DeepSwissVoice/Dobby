@@ -14,13 +14,15 @@ class Job:
     task: "Task"
     jobname: str
     slave: Slave
+    priority: int
     raw_kwargs: dict
     kwargs: dict
 
-    def __init__(self, task: "Task", jobname: str, slave: Slave, **kwargs):
+    def __init__(self, task: "Task", jobname: str, slave: Slave, priority: int = 0, **kwargs):
         self.task = task
         self.jobname = jobname
         self.slave = slave
+        self.priority = priority
         self.raw_kwargs = kwargs
         self.kwargs = {}
 
@@ -33,7 +35,8 @@ class Job:
     def load(cls, task: "Task", jobname: str, config) -> "Job":
         slave_id = config.pop("slave")
         slave = task.dobby.get_slave(slave_id)
-        return cls(task, jobname, slave, **config)
+        priority = config.pop("priority", 0)
+        return cls(task, jobname, slave, priority, **config)
 
     @property
     def jobid(self) -> str:

@@ -1,15 +1,33 @@
 import inspect
+import logging
 from inspect import Parameter
-from typing import Any, Callable, Dict, Optional, Type, TypeVar
+from typing import Any, Callable, Dict, Optional, Type, TypeVar, Union, _GenericAlias
 
 from .context import Context
-from .converter import Converter
+from .converter import CONVERTER_MAP, Converter
+
+log = logging.getLogger(__name__)
 
 
-def transform_param(param: Parameter, arg: Any, **kwargs) -> Any:
-    converter = param.annotation
-    if converter is Parameter.empty:
-        return arg
+def convert(converter, arg, **kwargs):
+    if isinstance(converter, _GenericAlias):
+        if getattr(converter, "__origin__") is Union:
+            types = getattr(converter, "__args__")
+            if isinstance(arg, types):
+                return arg
+            else:
+                for _type in types:
+                    last_exc = None
+                    try:
+                        return convert(_type, arg, **kwargs)
+                    except Exception as e:
+                        e.__cause__ = last_exc
+                        last_exc = e
+                        log.debug(f"Couldn't coerce {arg} to {_type}")
+                    raise TypeError(f"Couldn't convert {arg} to any of {converter}") from last_exc
+
+    if converter in CONVERTER_MAP:
+        converter = CONVERTER_MAP[converter]
 
     if inspect.isclass(converter):
         if issubclass(converter, Converter):
@@ -21,6 +39,14 @@ def transform_param(param: Parameter, arg: Any, **kwargs) -> Any:
         return converter.convert(arg, **kwargs)
 
     return converter(arg)
+
+
+def transform_param(param: Parameter, arg: Any, **kwargs) -> Any:
+    converter = param.annotation
+    if converter is Parameter.empty:
+        return arg
+
+    return convert(converter, arg, **kwargs)
 
 
 class Slave:

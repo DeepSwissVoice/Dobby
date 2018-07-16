@@ -10,6 +10,8 @@ _DEFAULT = object()
 
 
 class ListContainer(UserList):
+    __class__ = list
+
     env: "Environment"
     data: list
 
@@ -20,8 +22,18 @@ class ListContainer(UserList):
     def __getitem__(self, item: int) -> Any:
         return getitem(self.env, super().__getitem__(item))
 
+    def to_normal(self) -> list:
+        normal = []
+        for el in self.data:
+            if isinstance(el, (ListContainer, DictContainer)):
+                el = el.to_normal()
+            normal.append(el)
+        return normal
+
 
 class DictContainer(UserDict):
+    __class__ = dict
+    
     env: "Environment"
     data: dict
 
@@ -34,6 +46,14 @@ class DictContainer(UserDict):
 
     def __getitem__(self, item: Any) -> Any:
         return getitem(self.env, super().__getitem__(item))
+
+    def to_normal(self) -> dict:
+        normal = {}
+        for key, val in self.data.items():
+            if isinstance(val, (ListContainer, DictContainer)):
+                val = val.to_normal()
+            normal[key] = val
+        return normal
 
 
 def getitem(env: "Environment", value: Any) -> Any:

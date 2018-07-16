@@ -1,6 +1,7 @@
 import logging
 import time
 from datetime import datetime
+from operator import attrgetter
 from pathlib import Path
 from typing import List
 
@@ -16,12 +17,14 @@ log = logging.getLogger(__name__)
 class Dobby(GroupMixin):
     config: Config
     tasks: List[Task]
+    ctx: Context
 
     def __init__(self, config: Config, tasks: List[Task] = None):
         super().__init__()
 
         self.config = config
         self.tasks = tasks or []
+        self.ctx = Context(self)
         slaves.setup(self)
 
     @classmethod
@@ -42,20 +45,31 @@ class Dobby(GroupMixin):
             else:
                 log.debug(f"Task {taskid} disabled!")
 
+        inst.tasks.sort(key=attrgetter("priority"), reverse=True)
+
         return inst
 
-    def wait_for_next(self) -> Task:
+    def wait_for_next(self):
         now = datetime.now()
-        next_time, next_task = min((task.next_execution(now), task) for task in self.tasks)
+        next_time = min(task.next_execution for task in self.tasks)
         sleep_time = (next_time - now).total_seconds()
-        log.debug(f"sleeping for {sleep_time} second(s)")
-        time.sleep(sleep_time)
-        return next_task
+        if sleep_time >= 0:
+            log.debug(f"sleeping for {sleep_time} second(s)")
+            time.sleep(sleep_time)
+        else:
+            log.warning(f"{-sleep_time}s behind schedule!")
+
+    def execute_due_tasks(self):
+        for task in self.tasks:
+            task.execute_if_due(datetime.now(), self.ctx.copy())
 
     def run(self):
         log.info("start")
+        now = datetime.now()
+        for task in self.tasks:
+            task.plan_next_execution(now)
+
         while True:
-            task = self.wait_for_next()
-            ctx = Context(self)
-            task.execute(ctx.copy())
+            self.wait_for_next()
+            self.execute_due_tasks()
             log.debug("loop finished")

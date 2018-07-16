@@ -16,8 +16,8 @@ COPY Pipfile.lock ./
 RUN pipenv install
 
 # SETUP
-COPY dobby ./
-COPY ext ./
+COPY dobby dobby
+COPY ext ext
 COPY config.yml ./_config.yml
 COPY .docker/entrypoint.sh ./
 COPY .docker/supervisord.conf /etc/

@@ -1,21 +1,55 @@
-from typing import Callable, Optional, Type, TypeVar
+import inspect
+from inspect import Parameter
+from typing import Any, Callable, Dict, Optional, Type, TypeVar
 
 from .context import Context
+from .converter import Converter
+
+
+def transform_param(param: Parameter, arg: Any, **kwargs) -> Any:
+    converter = param.annotation
+    if converter is Parameter.empty:
+        return arg
+
+    if inspect.isclass(converter):
+        if issubclass(converter, Converter):
+            inst = converter()
+            return inst.convert(arg, **kwargs)
+        elif hasattr(converter, "convert") and inspect.ismethod(converter.convert):
+            return converter.convert(arg, **kwargs)
+    elif isinstance(converter, Converter):
+        return converter.convert(arg, **kwargs)
+
+    return converter(arg)
 
 
 class Slave:
     name: str
     callback: Optional[Callable]
+    instance: Optional[Any]
     parent: Optional["Slave"]
+    params: Dict[str, Parameter]
 
     def __init__(self, name: str, callback: Callable = None, **kwargs):
         self.name = name
         self.callback = callback
 
+        self.instance = None
         self.parent = kwargs.get("parent")
+
+        if callback:
+            signature = inspect.signature(callback)
+            self.params = signature.parameters.copy()
+        else:
+            self.params = None
 
     def __repr__(self) -> str:
         return f"<Slave {self.qualified_name}>"
+
+    def __get__(self, instance, owner):
+        if instance is not None:
+            self.instance = instance
+        return self
 
     @property
     def qualified_name(self) -> str:
@@ -23,11 +57,49 @@ class Slave:
             return self.parent.qualified_name + "." + self.name
         return self.name
 
-    def invoke(self, ctx: Context):
-        if self.callback:
-            self.callback(ctx, *ctx.args, **ctx.kwargs)
-        else:
+    def transform_arguments(self, arguments: dict) -> dict:
+        kwargs = {}
+        input_args = arguments.copy()
+        iterator = iter(self.params.items())
+
+        if self.instance is not None:
+            try:
+                next(iterator)
+            except StopIteration:
+                raise Exception(f"{self} is missing self arg")
+
+        try:
+            next(iterator)
+        except StopIteration:
+            raise Exception(f"{self} is missing ctx arg")
+
+        for name, param in iterator:
+            if param.kind == Parameter.VAR_KEYWORD:
+                kwargs.update(input_args)
+
+            required = param.default is Parameter.empty
+            if name in input_args:
+                arg = input_args.pop(name)
+                value = transform_param(param, arg, arguments=arguments, slave=self)
+            elif required:
+                raise KeyError(f"{self} requires {name} arguments but it wasn't provided'")
+            else:
+                value = param.default
+            kwargs[name] = value
+
+        return kwargs
+
+    def prepare(self, ctx: Context):
+        ctx.slave = self
+        ctx.args = [ctx] if self.instance is None else [self.instance, ctx]
+
+    def invoke(self, ctx: Context) -> Context:
+        if not self.callback:
             raise Exception(f"{self} is not a worker slave!")
+        self.prepare(ctx)
+        result = self.callback(*ctx.args, **ctx.kwargs)
+        ctx.result = result
+        return ctx
 
 
 T = TypeVar("T")

@@ -1,10 +1,10 @@
-from dobby import Group, GroupMixin
+from dobby import Context, Group, GroupMixin
 
 swissvoice = Group(name="swissvoice")
 
 
 @swissvoice.slave()
-def zip():
+def zip(ctx: Context):
     pass
 
 

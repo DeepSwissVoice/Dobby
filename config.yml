@@ -21,15 +21,15 @@ tasks:
     jobs:
       accept_texts:
         slave:      dobby.mongodb.move_documents
-        database:   SwissVoice
+        database:   $SwissVoice
         from_coll:  proposed_texts
         to_coll:    texts
         condition:
           votes: {$gte: 10}
           $expr: {$gte: [{$divide:["$balance", "$votes"]}, .8]}
       reject_texts:
-        slave:      dobby.mongodb.delete_documents
-        database:   SwissVoice
+        slave:      dobby.mongodb.remove_documents
+        database:   $SwissVoice
         from_coll:  proposed_texts
         condition:
           $or:

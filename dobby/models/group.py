@@ -47,6 +47,8 @@ class GroupMixin(abc.ABC):
 
         if not key:
             if isinstance(self, Slave):
+                if not self.callback:
+                    raise Exception(f"{self} is not a worker slave!")
                 return self
             else:
                 raise KeyError(f"key lead to {type(self)} instead of a Slave")
@@ -67,14 +69,6 @@ class GroupMixin(abc.ABC):
     def slave(self, *args, **kwargs) -> Callable[[Callable], Slave]:
         def decorator(func: Callable) -> Slave:
             slave = slave_decorator(*args, **kwargs)(func)
-            self.add_slave(slave)
-            return slave
-
-        return decorator
-
-    def group(self, *args, **kwargs) -> Callable[[Callable], "Group"]:
-        def decorator(func: Callable) -> Group:
-            slave = group(*args, **kwargs)(func)
             self.add_slave(slave)
             return slave
 

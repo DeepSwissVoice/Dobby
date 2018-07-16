@@ -6,7 +6,7 @@ from typing import List
 
 from . import slaves
 from .config import Config
-from .models import GroupMixin, Task
+from .models import Context, GroupMixin, Task
 from .utils import setup_sentry
 
 setup_sentry()
@@ -26,13 +26,16 @@ class Dobby(GroupMixin):
 
     @classmethod
     def load(cls, fp: Path) -> "Dobby":
+        log.debug("loading config")
         config = Config.load(fp)
 
         inst = cls(config)
 
+        log.debug("loading extensions")
         for ext in config.ext:
             inst.load_ext(ext)
 
+        log.debug("building tasks")
         for taskid, task_config in config.tasks.items():
             if task_config.get("enabled", True):
                 inst.tasks.append(Task.load(inst, taskid, task_config))
@@ -41,12 +44,18 @@ class Dobby(GroupMixin):
 
         return inst
 
+    def wait_for_next(self) -> Task:
+        now = datetime.now()
+        next_time, next_task = min((task.next_execution(now), task) for task in self.tasks)
+        sleep_time = (next_time - now).total_seconds()
+        log.debug(f"sleeping for {sleep_time} second(s)")
+        time.sleep(sleep_time)
+        return next_task
+
     def run(self):
         log.info("start")
         while True:
-            now = datetime.now()
-            next_time = min(task.next_execution(now) for task in self.tasks)
-            sleep_time = (next_time - now).total_seconds()
-            log.debug(f"sleeping for {sleep_time} second(s)")
-            time.sleep(sleep_time)
-            break
+            task = self.wait_for_next()
+            ctx = Context(self)
+            task.execute(ctx.copy())
+            log.debug("loop finished")

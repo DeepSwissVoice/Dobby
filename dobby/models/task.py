@@ -46,9 +46,11 @@ class Task:
         return inst
 
     def execute(self, ctx: Context):
+        ctx.task = self
         log.info(f"{self} running {len(self.jobs)} jobs")
         for job in self.jobs:
-            job.run(ctx)
+            log.debug(f"running job {job}")
+            job.run(ctx.copy())
 
     def next_execution(self, time: datetime) -> datetime:
         return self.calendar.next_event(time)

@@ -55,7 +55,7 @@ class Task:
 
     def execute(self, ctx: Context):
         ctx.task = self
-        log.info(f"{self} running {len(self.jobs)} jobs")
+        log.info(f"{self} running {len(self.jobs)} job(s)")
         for job in self.jobs:
             log.debug(f"running job {job}")
             job.run(ctx.copy())

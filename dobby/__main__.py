@@ -19,6 +19,12 @@ def run(args: Namespace):
     dobby.run()
 
 
+def test(args: Namespace):
+    log.info(f"Dobby v{__version__} TEST")
+    dobby = Dobby.load(args.config_file)
+    dobby.test()
+
+
 def main():
     parser = ArgumentParser("dobby")
     subparsers = parser.add_subparsers(title="commands")
@@ -26,6 +32,10 @@ def main():
     run_parser = subparsers.add_parser("run")
     run_parser.add_argument("config_file", type=Path)
     run_parser.set_defaults(func=run)
+
+    run_parser = subparsers.add_parser("test")
+    run_parser.add_argument("config_file", type=Path)
+    run_parser.set_defaults(func=test)
 
     args = parser.parse_args()
     args.func(args)

@@ -1,4 +1,4 @@
-ext: swissvoice
+ext: ext.swissvoice
 
 env:
   STATISTICS_URL: https://swiss-voice.ch/api/stats

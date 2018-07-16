@@ -73,3 +73,9 @@ class Dobby(GroupMixin):
             self.wait_for_next()
             self.execute_due_tasks()
             log.debug("loop finished")
+
+    def test(self):
+        log.info("executing all tasks!")
+        for task in self.tasks:
+            task.execute(self.ctx.copy())
+        log.info("done")

@@ -26,3 +26,12 @@ def find_extensions(fp: str, pkg: str) -> list:
         if hasattr(mod, "setup"):
             exts.append(mod)
     return exts
+
+
+class SubclassMount(type):
+
+    def __init__(cls, name, bases, attrs):
+        if not hasattr(cls, "_subcls"):
+            cls._subcls = []
+            return
+        cls._subcls.append(cls)

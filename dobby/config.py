@@ -9,18 +9,31 @@ import yaml
 _DEFAULT = object()
 
 
-class ListContainer(UserList):
-    __class__ = list
-
+class _Container:
     env: "Environment"
-    data: list
 
-    def __init__(self, env: "Environment", data: list = None):
+    def __init__(self, env: "Environment", data, *args, **kwargs):
         self.env = env
         super().__init__(data)
 
+    def __getstate__(self):
+        return dict(env=self.env, data=self.data)
+
+    def __setstate__(self, state):
+        self.env = state["env"]
+        self.data = state["data"]
+
     def __getitem__(self, item: int) -> Any:
         return getitem(self.env, super().__getitem__(item))
+
+
+class ListContainer(_Container, UserList):
+    __class__ = list
+
+    data: list
+
+    def __init__(self, env: "Environment", data: list = None):
+        super().__init__(env, data)
 
     def to_normal(self) -> list:
         normal = []
@@ -31,21 +44,16 @@ class ListContainer(UserList):
         return normal
 
 
-class DictContainer(UserDict):
+class DictContainer(_Container, UserDict):
     __class__ = dict
 
-    env: "Environment"
     data: dict
 
     def __init__(self, env: "Environment", data: dict = None):
-        self.env = env
-        super().__init__(data)
+        super().__init__(env, data)
 
     def __getattr__(self, item: str) -> Any:
         return self.__getitem__(item)
-
-    def __getitem__(self, item: Any) -> Any:
-        return getitem(self.env, super().__getitem__(item))
 
     def to_normal(self) -> dict:
         normal = {}
@@ -87,9 +95,10 @@ class Config(UserDict):
     ext: ListContainer
     tasks: DictContainer
 
-    def __init__(self, env: Environment, ext: ListContainer, tasks: DictContainer, data: DictContainer):
+    def __init__(self, env: Environment, ext: ListContainer, notifications: DictContainer, tasks: DictContainer, data: DictContainer):
         self.env = env
         self.ext = ext
+        self.notifications = notifications
         self.tasks = tasks
         super().__init__(data)
 
@@ -103,7 +112,8 @@ class Config(UserDict):
             _ext = [_ext]
         ext = ListContainer(env, _ext)
 
-        tasks = DictContainer(env, config.pop("tasks", {}))
+        notifications = DictContainer(env, config.pop("notifications", None))
+        tasks = DictContainer(env, config.pop("tasks", None))
         data = DictContainer(env, config)
 
-        return cls(env, ext, tasks, data)
+        return cls(env, ext, notifications, tasks, data)

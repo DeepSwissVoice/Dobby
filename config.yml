@@ -3,6 +3,10 @@ ext: ext.swissvoice
 env:
   STATISTICS_URL: https://swiss-voice.ch/api/stats
 
+notifications:
+  webhook:
+    url: $WEBHOOK_URL
+
 tasks:
   statistics:
     run: weekly

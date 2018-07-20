@@ -9,3 +9,4 @@ services:
     environment:
       - SENTRY_DSN
       - SWISSVOICE_DB_URI
+      - WEBHOOK_URL

@@ -8,6 +8,7 @@ from typing import List
 from . import slaves
 from .config import Config
 from .models import Context, GroupMixin, Task
+from .models.notifications import NotificationManager
 from .utils import setup_sentry
 
 setup_sentry()
@@ -16,6 +17,7 @@ log = logging.getLogger(__name__)
 
 class Dobby(GroupMixin):
     config: Config
+    notification_manager: NotificationManager
     tasks: List[Task]
     ctx: Context
 
@@ -23,6 +25,7 @@ class Dobby(GroupMixin):
         super().__init__()
 
         self.config = config
+        self.notification_manager = NotificationManager.load(config.notifications)
         self.tasks = tasks or []
         self.ctx = Context(self)
         slaves.setup(self)

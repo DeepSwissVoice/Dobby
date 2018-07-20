@@ -50,5 +50,5 @@ class Job:
         ctx.job = self
         ctx.input_args = self.raw_kwargs
         ctx.kwargs = self.kwargs
-        ctx = self.slave.invoke(ctx)
+        self.slave.invoke(ctx)
         log.info(f"{self} returned {ctx.result}")

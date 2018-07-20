@@ -4,7 +4,6 @@ FROM python:alpine
 LABEL maintainer="Simon (siku2)"
 
 # PREREQUISITES
-RUN apk add --no-cache bash
 RUN pip install pipenv
 RUN pip install https://github.com/Supervisor/supervisor/archive/master.zip
 

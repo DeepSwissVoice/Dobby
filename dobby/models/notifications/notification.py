@@ -21,8 +21,8 @@ def iter_format(inst, *args, **kwargs):
     if isinstance(inst, str):
         return inst.format(*args, **kwargs)
     elif isinstance(inst, list):
-        for i in range(len(inst)):
-            inst[i] = iter_format(inst[i], *args, **kwargs)
+        for i, value in enumerate(inst):
+            inst[i] = iter_format(value, *args, **kwargs)
     elif isinstance(inst, dict):
         for key in inst:
             inst[key] = iter_format(inst[key], *args, **kwargs)

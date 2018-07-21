@@ -34,7 +34,7 @@ class Manager:
     def send(self, notification: Notification):
         for carrier in self.carriers:
             exc = None
-            
+
             try:
                 delivered = carrier.deliver(notification)
             except Exception as e:

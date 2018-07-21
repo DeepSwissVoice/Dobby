@@ -3,15 +3,35 @@ ext: ext.swissvoice
 env:
   STATISTICS_URL: https://swiss-voice.ch/api/stats
 
+notifications:
+  webhook:
+    url: $WEBHOOK_URL
+
 tasks:
   statistics:
     run: weekly
+
+    report:
+      title: "Generated Statistics"
+      fields:
+        Proposed Texts: "{result.json.data.total_proposed}"
+        Samples:        "{result.json.data.total_samples}"
+        Texts:          "{result.json.data.total_texts}"
+        Votes:          "{result.json.data.total_votes}"
+
     job:
       slave:  dobby.get_url
       url:    $STATISTICS_URL
 
-  trial:
-    run: monthly
+  text_trial:
+    run:    monthly
+
+    report:
+      title: "Proposed Text Trial"
+      fields:
+        Accepted: "{accept_texts.result}"
+        Rejected: "{reject_texts.result}"
+
     jobs:
       accept_texts:
         slave:      dobby.mongodb.move_documents
@@ -24,6 +44,7 @@ tasks:
         projection:
           - region
           - text
+
       reject_texts:
         slave:      dobby.mongodb.remove_documents
         database:   $SWISSVOICE_DB_URI

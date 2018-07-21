@@ -1,6 +1,7 @@
 import importlib
 import logging
 from pathlib import Path
+from typing import Callable
 
 from raven import Client
 from raven.handlers.logging import SentryHandler
@@ -26,3 +27,16 @@ def find_extensions(fp: str, pkg: str) -> list:
         if hasattr(mod, "setup"):
             exts.append(mod)
     return exts
+
+
+class SubclassMount(type):
+
+    def __init__(cls, name, bases, attrs):
+        if not hasattr(cls, "_subcls"):
+            cls._subcls = []
+            return
+        cls._subcls.append(cls)
+
+
+def filter_dict(d: dict, cond: Callable = bool) -> dict:
+    return {key: value for key, value in d.items() if cond(value)}

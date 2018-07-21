@@ -1,5 +1,5 @@
 import copy
-from typing import Any, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .job import Job
@@ -17,6 +17,7 @@ class Context:
     args: list
     kwargs: dict
     result: Any
+    exception: Optional[Exception]
 
     def __init__(self, dobby: "Dobby", **kwargs):
         self.dobby = dobby
@@ -27,6 +28,7 @@ class Context:
         self.args = kwargs.pop("args", None)
         self.kwargs = kwargs.pop("kwargs", None)
         self.result = kwargs.pop("result", None)
+        self.exception = kwargs.pop("exception", None)
 
     def __str__(self) -> str:
         return "Context!"

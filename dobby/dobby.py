@@ -3,12 +3,12 @@ import time
 from datetime import datetime
 from operator import attrgetter
 from pathlib import Path
-from typing import List
+from typing import Dict, List, Union
 
-from . import slaves
+from . import __version__, slaves
 from .config import Config
 from .models import Context, GroupMixin, Task
-from .models.notifications import NotificationManager
+from .models.notifications import Notification, NotificationManager
 from .utils import setup_sentry
 
 setup_sentry()
@@ -52,6 +52,11 @@ class Dobby(GroupMixin):
 
         return inst
 
+    def send_notification(self, notification: Union[Notification, Dict] = None, *embeds, **kwargs):
+        if not isinstance(notification, Notification):
+            notification = Notification(notification, *embeds, **kwargs)
+        return self.notification_manager.send(notification)
+
     def wait_for_next(self):
         now = datetime.now()
         next_time = min(task.next_execution for task in self.tasks)
@@ -68,6 +73,16 @@ class Dobby(GroupMixin):
 
     def run(self):
         log.info("start")
+
+        self.send_notification(dict(
+            title="Dobby is starting",
+            fields=[dict(title="Tasks",
+                         value=len(self.tasks)),
+                    dict(title="Jobs",
+                         value=sum(len(task.jobs) for task in self.tasks))],
+            footer=f"Dobby v{__version__}"
+        ))
+
         now = datetime.now()
         for task in self.tasks:
             task.plan_next_execution(now)

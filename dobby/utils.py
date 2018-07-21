@@ -1,6 +1,7 @@
 import importlib
 import logging
 from pathlib import Path
+from typing import Callable
 
 from raven import Client
 from raven.handlers.logging import SentryHandler
@@ -35,3 +36,7 @@ class SubclassMount(type):
             cls._subcls = []
             return
         cls._subcls.append(cls)
+
+
+def filter_dict(d: dict, cond: Callable = bool) -> dict:
+    return {key: value for key, value in d.items() if cond(value)}

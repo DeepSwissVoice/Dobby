@@ -87,16 +87,16 @@ class Slave:
         ctx.slave = self
         ctx.args = [ctx] if self.instance is None else [self.instance, ctx]
 
-    def invoke(self, ctx: Context) -> Context:
+    def invoke(self, ctx: Context):
         if not self.callback:
             raise Exception(f"{self} is not a worker slave!")
+
         self.prepare(ctx)
         try:
             result = self.callback(*ctx.args, **ctx.kwargs)
             ctx.result = result
         except Exception as e:
             ctx.exception = e
-        return ctx
 
 
 T = TypeVar("T")

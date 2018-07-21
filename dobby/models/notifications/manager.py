@@ -33,7 +33,13 @@ class Manager:
 
     def send(self, notification: Notification):
         for carrier in self.carriers:
+            exc = None
+            
             try:
-                carrier.deliver(notification)
+                delivered = carrier.deliver(notification)
             except Exception as e:
-                log.warning(f"{carrier} failed to deliver {notification} ({e})")
+                exc = e
+                delivered = False
+
+            if not delivered:
+                log.warning(f"{carrier} failed to deliver {notification} ({exc})")

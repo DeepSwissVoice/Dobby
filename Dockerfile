@@ -21,5 +21,7 @@ COPY config.yml ./_config.yml
 COPY .docker/entrypoint.sh ./
 COPY .docker/supervisord.conf /etc/
 
+RUN chmod +x entrypoint.sh
+
 # RUN
 ENTRYPOINT ["./entrypoint.sh"]

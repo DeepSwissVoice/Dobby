@@ -11,7 +11,8 @@ class ResultProxy:
         self._target = target
 
     def __call__(self, *args, **kwargs):
-        return self._target(*args, **kwargs)
+        value = self._target(*args, **kwargs)
+        return ResultProxy(value)
 
     def __repr__(self) -> str:
         return repr(self._target)
@@ -54,7 +55,6 @@ class Report:
 
     @classmethod
     def load(cls, config: Optional[Union[dict, list, bool]]) -> "Report":
-        template = None
         if isinstance(config, dict):
             if "fields" in config or "title" in config:
                 config = dict(embeds=[config])
@@ -64,6 +64,8 @@ class Report:
             template = Notification(*config)
         elif config is True:
             template = DEFAULT_NOTIFICATION.copy()
+        else:
+            template = None
 
         return cls(template)
 

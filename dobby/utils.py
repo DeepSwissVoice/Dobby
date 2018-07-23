@@ -40,3 +40,16 @@ class SubclassMount(type):
 
 def filter_dict(d: dict, cond: Callable = bool) -> dict:
     return {key: value for key, value in d.items() if cond(value)}
+
+
+def human_timedelta(s: int) -> str:
+    if s >= 2592000:
+        return f"{round(s / 2592000)} month(s)"
+    if s >= 86400:
+        return f"{round(s / 86400)} day(s)"
+    if s >= 3600:
+        return f"{round(s / 3600)} hour(s)"
+    elif s >= 300:
+        return f"{round(s / 60)} minute(s)"
+    else:
+        return f"{round(s)} second(s)"

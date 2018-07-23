@@ -10,6 +10,15 @@ log = logging.getLogger(__name__)
 
 
 class Converter(abc.ABC):
+    def __repr__(self) -> str:
+        sig = inspect.signature(self.convert)
+        return_hint = sig.return_annotation
+        if return_hint not in {sig.empty, Any}:
+            return_name = return_hint.__name__ if inspect.isclass(return_hint) else return_hint
+            return f"[ str -> {return_name} ]"
+        else:
+            return f"<{type(self).__name__}>"
+
     @abc.abstractmethod
     def convert(self, arg: Any, **kwargs) -> Any:
         pass

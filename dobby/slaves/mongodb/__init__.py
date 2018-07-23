@@ -17,7 +17,7 @@ class DatabaseConverter(Converter):
     def convert(self, arg: Union[str, dict], **kwargs) -> Database:
         if isinstance(arg, str):
             return MongoClient(arg).get_database()
-        raise NotImplementedError("Not yet implemented")
+        raise NotImplementedError
 
 
 def mv_documents(from_coll: Collection, to_coll: Collection, condition: dict, projection: Union[list, dict] = None, batch_size=100) -> int:

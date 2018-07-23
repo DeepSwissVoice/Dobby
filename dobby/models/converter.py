@@ -4,6 +4,7 @@ import logging
 from typing import Any, Union
 
 from ..config import DictContainer, ListContainer
+from ..errors import ConversionError
 
 log = logging.getLogger(__name__)
 
@@ -46,22 +47,30 @@ def convert(converter, arg, **kwargs):
                     last_exc = None
                     try:
                         return convert(_type, arg, **kwargs)
+                    except ConversionError:
+                        raise
                     except Exception as e:
                         e.__cause__ = last_exc
                         last_exc = e
-                        log.debug(f"Couldn't coerce {arg} to {_type}")
-                    raise TypeError(f"Couldn't convert {arg} to any of {converter}") from last_exc
+                        log.debug(f"Couldn't coerce {arg!r} to {_type}")
+                    raise ConversionError(f"Couldn't convert {arg!r} to any of {converter}", value=arg, converter=converter) from last_exc
 
     if converter in CONVERTER_MAP:
         converter = CONVERTER_MAP[converter]
 
-    if inspect.isclass(converter):
-        if issubclass(converter, Converter):
-            inst = converter()
-            return inst.convert(arg, **kwargs)
-        elif hasattr(converter, "convert") and inspect.ismethod(converter.convert):
+    try:
+        if inspect.isclass(converter):
+            if issubclass(converter, Converter):
+                inst = converter()
+                return inst.convert(arg, **kwargs)
+            elif hasattr(converter, "convert") and inspect.ismethod(converter.convert):
+                return converter.convert(arg, **kwargs)
+        elif isinstance(converter, Converter):
             return converter.convert(arg, **kwargs)
-    elif isinstance(converter, Converter):
-        return converter.convert(arg, **kwargs)
 
-    return converter(arg)
+        return converter(arg)
+    except ConversionError:
+        raise
+    except Exception as e:
+        raise ConversionError(f"Couldn't convert {arg!r} using {converter}", value=arg, converter=converter,
+                              hint="Make sure that you're passing a valid value for the parameter \"{self.key}\"") from e

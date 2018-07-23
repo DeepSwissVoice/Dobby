@@ -9,14 +9,22 @@ import logging
 from argparse import ArgumentParser, Namespace
 
 from . import __version__, Dobby
+from .errors import DobbyError
 
 log = logging.getLogger(__package__)
 
 
 def run(args: Namespace):
     log.info(f"Dobby v{__version__}")
-    dobby = Dobby.load(args.config_file)
-    dobby.run()
+    try:
+        dobby = Dobby.load(args.config_file)
+    except DobbyError as e:
+        text = "Couldn't start Dobby"
+        if e.hint:
+            text += ": " + e.hint
+        log.exception(text)
+    else:
+        dobby.run()
 
 
 def test(args: Namespace):

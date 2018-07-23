@@ -1,15 +1,19 @@
+import abc
 import os
 from ast import literal_eval
 from collections import UserDict, UserList
+from contextlib import suppress
 from pathlib import Path
 from typing import Any
 
 import yaml
 
+from .errors import EnvError
+
 _DEFAULT = object()
 
 
-class _Container:
+class _Container(abc.ABC):
     env: "Environment"
 
     def __init__(self, env: "Environment", data, *args, **kwargs):
@@ -23,7 +27,7 @@ class _Container:
         self.env = state["env"]
         self.data = state["data"]
 
-    def __getitem__(self, item: int) -> Any:
+    def __getitem__(self, item: Any) -> Any:
         return getitem(self.env, super().__getitem__(item))
 
 
@@ -75,6 +79,18 @@ def getitem(env: "Environment", value: Any) -> Any:
     return value
 
 
+# noinspection PyUnreachableCode
+def parse_value(value: str) -> Any:
+    with suppress(SyntaxError, ValueError):
+        return literal_eval(value)
+
+    quoted_value = "\"" + value.replace("\"", "\\\"") + "\""
+    try:
+        return literal_eval(quoted_value)
+    except (SyntaxError, ValueError) as e:
+        raise ValueError(f"Couldn't parse value {value}") from e
+
+
 class Environment(DictContainer):
     def __init__(self, data: dict = None):
         super().__init__(self, data)
@@ -82,12 +98,19 @@ class Environment(DictContainer):
     def __getitem__(self, item: Any) -> Any:
         value = os.getenv(str(item), _DEFAULT)
         if value is not _DEFAULT:
-            value = literal_eval(value)
+            try:
+                value = parse_value(value)
+            except ValueError:
+                raise EnvError(f"Couldn't parse value of key \"{item}\" in environment variables ({value})",
+                               hint="Make sure the value is well-formatted!")
+
             return getitem(self, value)
+
         try:
             return super().__getitem__(item)
         except KeyError:
-            raise KeyError(f"Environment is missing \"{item}\" which is required!")
+            raise EnvError(f"Your env is missing \"{item}\" which is required!",
+                           hint="Define it in the config file or set it in the environment variables")
 
 
 class Config(UserDict):

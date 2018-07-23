@@ -3,6 +3,7 @@ from typing import List
 
 from .carrier import Carrier, get_carrier
 from .notification import Notification
+from ...errors import SetupError
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +21,9 @@ class Manager:
         for key, value in config.items():
             carrier_cls = get_carrier(key)
             if not carrier_cls:
-                raise KeyError(f"Couldn't find carrier \"{key}\"")
+                raise SetupError(f"Couldn't find carrier \"{key}\"",
+                                 hint="Check whether the name is spelled correctly and, "
+                                      "if the carrier belongs to an extension, whether the extension is loaded")
 
             if not isinstance(value, list):
                 value = [value]

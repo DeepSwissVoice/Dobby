@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, Optional, Type, TypeVar
 
 from .context import Context
 from .converter import convert
+from ..errors import ConversionError, SetupError
 
 log = logging.getLogger(__name__)
 
@@ -60,12 +61,14 @@ class Slave:
             try:
                 next(iterator)
             except StopIteration:
-                raise Exception(f"{self} is missing self arg")
+                raise SyntaxError(f"{self} is bound to an instance but missing the self arg."
+                                  "If you're the maintainer of this slave, please make sure to add \"self\" as the first positional argument")
 
         try:
             next(iterator)
         except StopIteration:
-            raise Exception(f"{self} is missing ctx arg")
+            raise SyntaxError(f"{self} is missing ctx arg. All slaves must accept the context as a positional argument."
+                              "If you're the maintainer of this slave, please add it!")
 
         for name, param in iterator:
             if param.kind == Parameter.VAR_KEYWORD:
@@ -74,9 +77,15 @@ class Slave:
             required = param.default is Parameter.empty
             if name in input_args:
                 arg = input_args.pop(name)
-                value = transform_param(param, arg, arguments=arguments, slave=self)
+                try:
+                    value = transform_param(param, arg, arguments=arguments, slave=self)
+                except ConversionError as e:
+                    e.key = name
+                    raise e
+
             elif required:
-                raise KeyError(f"{self} requires \"{name}\" argument but it wasn't provided'")
+                raise SetupError(f"{self} requires \"{name}\" argument but it wasn't provided",
+                                 hint="Make sure to pass all required arguments to the slave in your config file!")
             else:
                 value = param.default
             kwargs[name] = value
@@ -89,7 +98,7 @@ class Slave:
 
     def invoke(self, ctx: Context):
         if not self.callback:
-            raise Exception(f"{self} is not a worker slave!")
+            raise SetupError(f"{self} is not a worker slave but a group!", ctx=ctx, hint="Check whether you've entered the slave key correctly!")
 
         self.prepare(ctx)
         try:

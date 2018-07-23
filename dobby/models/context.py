@@ -31,7 +31,16 @@ class Context:
         self.exception = kwargs.pop("exception", None)
 
     def __str__(self) -> str:
-        return "Context!"
+        return "Context matters!"
 
     def copy(self) -> "Context":
         return copy.copy(self)
+
+    def prettify(self) -> str:
+        lines = []
+        for key, value in vars(self).items():
+            if not value:
+                continue
+            lines.append(f"{key}: {value}")
+
+        return "\n".join(lines)

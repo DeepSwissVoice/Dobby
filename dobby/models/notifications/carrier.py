@@ -5,6 +5,7 @@ from typing import Optional, TYPE_CHECKING, Type
 
 from .notification import Notification
 from ..converter import convert
+from ...errors import SetupError
 from ...utils import SubclassMount
 
 if TYPE_CHECKING:
@@ -27,7 +28,8 @@ class Carrier(metaclass=CarrierMeta):
                 if hasattr(self, key):
                     continue
                 else:
-                    raise KeyError(f"{self} requires key \"{key}\" to be passed")
+                    raise SetupError(f"{self} requires key \"{key}\" to be passed",
+                                     hint="Make sure you're passing all the required arguments to the Carrier")
 
             _value = input_args.pop(key)
             value = convert(converter, _value, arguments=options, carrier=self)

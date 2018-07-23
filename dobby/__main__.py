@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 __package__ = "dobby"
 
 import sys

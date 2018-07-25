@@ -38,6 +38,10 @@ def test_normal():
     assert Calendar(month=5, day=7).next_event(dt) == datetime(2019, 6, 8)
     assert Calendar(day=EVERY(12)).next_event(dt) == datetime(2018, 7, 25)
 
+    dt = datetime(2018, 7, 25, 12, 56)
+    assert Calendar.from_config("weekly").next_event(dt) == datetime(2018, 7, 30)
+    assert Calendar.from_config("monthly").next_event(dt) == datetime(2018, 8, 1)
+
 
 def test_calendar():
     dt = datetime.now()

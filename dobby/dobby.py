@@ -65,7 +65,7 @@ class Dobby(GroupMixin):
             log.info(f"sleeping for {human_timedelta(sleep_time)}")
             time.sleep(sleep_time)
         else:
-            log.warning(f"{-sleep_time}s behind schedule!")
+            log.warning(f"{human_timedelta(-sleep_time)} behind schedule!")
 
     def execute_due_tasks(self):
         for task in self.tasks:

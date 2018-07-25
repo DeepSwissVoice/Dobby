@@ -1,0 +1,5 @@
+version: 0.1.1;
+release: unreleased;
+---
+
+FIXED[2]: The internal calendar now properly handles "monthly" tasks;

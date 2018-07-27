@@ -1,5 +1,8 @@
+// Loglette Changelog
+
 version: 0.1.1;
 release: unreleased;
 ---
 
+ADDED: Changelog!;
 FIXED[2]: The internal calendar now properly handles "monthly" tasks;

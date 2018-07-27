@@ -38,7 +38,7 @@ Mount your config file to `/dobby/config.yml` and you're ready to go!
 
 ## Manual Usage
 Start Dobby by running `dobby run <config file>`
-where `<config file>` points to the location of your [config file](#Configuration)...
+where `<config file>` points to the location of your [config file](#configuration)...
 
 If you for some reason desire to do a test run (runs through all tasks without waiting)
 you can run `dobby test <config file>`
@@ -47,9 +47,9 @@ you can run `dobby test <config file>`
 The configuration file is a YAML file which defines the behaviour of Dobby (obviously).
 It consists of the following keys:
 
-1. [env](#env)
-2. [ext](#ext)
-3. [notifications](#notifications)
+1. [env](#env-optional)
+2. [ext](#ext-optional)
+3. [notifications](#notifications-optional)
 4. [tasks](#tasks)
 
 ### *env* (optional)

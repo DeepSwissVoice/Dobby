@@ -13,7 +13,7 @@
  Well, Dobby might be able to scratch that itch. (No it can't *and probably shouldn't*)
  
  Dobby tries to make your life easier when it comes to doing chores around your server like
- cleaning up your database or triggering certain events by opening an url.
+ cleaning up your database or triggering certain events by opening a url.
  Dobby can do pretty much anything (as long as you code it yourself because I'm too lazy to
  code boiler-plate slaves that SwissVoice doesn't need) you need done every now and then.
  

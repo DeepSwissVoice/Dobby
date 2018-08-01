@@ -23,7 +23,7 @@ class Manager:
             if not carrier_cls:
                 raise SetupError(f"Couldn't find carrier \"{key}\"",
                                  hint="Check whether the name is spelled correctly and, "
-                                      "if the carrier belongs to an extension, whether the extension is loaded")
+                                      "if the carrier belongs to an extension, check whether the extension is loaded")
 
             if not isinstance(value, list):
                 value = [value]

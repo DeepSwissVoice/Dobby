@@ -5,5 +5,6 @@ release: unreleased;
 ---
 
 ADDED: Changelog!;
+CHANGED[1]: Improved [converters](https://deepswissvoice.github.io/Dobby) to be much more flexible;
 CHANGED: Instead of displaying meaningless seconds, Dobby now shows sleep time in a more reasonable unit;
 FIXED[2]: The internal calendar now properly handles "monthly" tasks;

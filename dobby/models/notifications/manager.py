@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from .carrier import Carrier, get_carrier
+from .carrier import Carrier, find_carrier
 from .notification import Notification
 from ...errors import SetupError
 
@@ -19,7 +19,7 @@ class Manager:
         inst = cls()
 
         for key, value in config.items():
-            carrier_cls = get_carrier(key)
+            carrier_cls = find_carrier(key)
             if not carrier_cls:
                 raise SetupError(f"Couldn't find carrier \"{key}\"",
                                  hint="Check whether the name is spelled correctly and, "

@@ -29,15 +29,6 @@ def find_extensions(fp: str, pkg: str) -> list:
     return exts
 
 
-class SubclassMount(type):
-
-    def __init__(cls, name, bases, attrs):
-        if not hasattr(cls, "_subcls"):
-            cls._subcls = []
-            return
-        cls._subcls.append(cls)
-
-
 def filter_dict(d: dict, cond: Callable = bool) -> dict:
     return {key: value for key, value in d.items() if cond(value)}
 

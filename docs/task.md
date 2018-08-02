@@ -53,5 +53,5 @@ template which shows the combined length of the sites' HTML.
 
 
 
-[Calendar]: calendar "Calendar Documentation"
-[Carrier]: notification#carrier "Notification (Carrier) Documentation"
+[Calendar]: calendar.md             "Calendar Documentation"
+[Carrier]:  notification.md#carrier "Notification (Carrier) Documentation"

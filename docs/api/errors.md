@@ -102,6 +102,6 @@ Raised when the conversion of a config value to the designated slave argument ty
 [`EnvError`]:           #enverror
 [`ConversionError`]:    #conversionerror
 
-[`Context`]:            /api/context    "Context Documentation"
+[`Context`]:            context.md  "Context Documentation"
 
 [Exception]:            https://docs.python.org/3/tutorial/errors.html  "Python Exception Documentation"

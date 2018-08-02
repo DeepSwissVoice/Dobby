@@ -16,8 +16,8 @@ Anyway, here are a few links for now:
 That's already it... Sorry
 
 
-[Configuration]:        configuration   "Config Documentation"
-[Task]:                 task            "Task Documentation"
-[Converter]:            converter       "Converter Documentation"
+[Configuration]:        configuration.md    "Config Documentation"
+[Task]:                 task.md             "Task Documentation"
+[Converter]:            converter.md        "Converter Documentation"
 
-[API Documentation]:    api             "API Documentation"
+[API Documentation]:    api                 "API Documentation"

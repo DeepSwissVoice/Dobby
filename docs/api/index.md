@@ -4,4 +4,4 @@ I can't even promise that I'll ever write something here
 
 1. [Errors]
 
-[Errors]:   errors  "Documentation for Dobby Errors"
+[Errors]:   errors.md   "Documentation for Dobby Errors"

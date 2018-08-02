@@ -1,3 +1,7 @@
 # Dobby API Documentation
 Yes, there's nothing here... What did you expect...
 I can't even promise that I'll ever write something here
+
+1. [Errors]
+
+[Errors]:   errors  "Documentation for Dobby Errors"

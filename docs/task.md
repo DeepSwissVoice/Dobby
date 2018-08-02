@@ -53,5 +53,5 @@ template which shows the combined length of the sites' HTML.
 
 
 
-[Calendar]: /Dobby/calendar "Calendar Documentation"
-[Carrier]: /Dobby/notification#carrier "Notification (Carrier) Documentation"
+[Calendar]: calendar "Calendar Documentation"
+[Carrier]: notification#carrier "Notification (Carrier) Documentation"

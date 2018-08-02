@@ -9,7 +9,7 @@ from . import __version__, slaves
 from .config import Config
 from .models import Context, GroupMixin, Task
 from .models.notifications import Notification, NotificationManager
-from .utils import setup_sentry
+from .utils import human_timedelta, setup_sentry
 
 setup_sentry()
 log = logging.getLogger(__name__)
@@ -62,10 +62,10 @@ class Dobby(GroupMixin):
         next_time = min(task.next_execution for task in self.tasks)
         sleep_time = (next_time - now).total_seconds()
         if sleep_time >= 0:
-            log.debug(f"sleeping for {sleep_time} second(s)")
+            log.info(f"sleeping for {human_timedelta(sleep_time)}")
             time.sleep(sleep_time)
         else:
-            log.warning(f"{-sleep_time}s behind schedule!")
+            log.warning(f"{human_timedelta(-sleep_time)} behind schedule!")
 
     def execute_due_tasks(self):
         for task in self.tasks:

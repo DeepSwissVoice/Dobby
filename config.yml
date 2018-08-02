@@ -24,7 +24,7 @@ tasks:
       url:    $STATISTICS_URL
 
   text_trial:
-    run:    monthly
+    run: monthly
 
     report:
       title: "Proposed Text Trial"

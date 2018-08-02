@@ -9,6 +9,7 @@ python_version = "3.7"
 [dev-packages]
 pytest = "*"
 pytest-cov = "*"
+loglette = "*"
 
 [packages]
 colorlog = "*"

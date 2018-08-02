@@ -29,14 +29,26 @@ def find_extensions(fp: str, pkg: str) -> list:
     return exts
 
 
-class SubclassMount(type):
-
-    def __init__(cls, name, bases, attrs):
-        if not hasattr(cls, "_subcls"):
-            cls._subcls = []
-            return
-        cls._subcls.append(cls)
-
-
 def filter_dict(d: dict, cond: Callable = bool) -> dict:
     return {key: value for key, value in d.items() if cond(value)}
+
+
+MINUTE_SEC = 60
+HOUR_SEC = MINUTE_SEC * 60
+DAY_SEC = HOUR_SEC * 24
+MONTH_SECONDS = DAY_SEC * 30
+
+_FIVE_MINUTE_SEC = 5 * MINUTE_SEC
+
+
+def human_timedelta(s: int) -> str:
+    if s >= MONTH_SECONDS:
+        return f"{round(s / MONTH_SECONDS)} month(s)"
+    if s >= DAY_SEC:
+        return f"{round(s / DAY_SEC)} day(s)"
+    if s >= HOUR_SEC:
+        return f"{round(s / HOUR_SEC)} hour(s)"
+    elif s >= _FIVE_MINUTE_SEC:
+        return f"{round(s / MINUTE_SEC)} minute(s)"
+    else:
+        return f"{round(s)} second(s)"

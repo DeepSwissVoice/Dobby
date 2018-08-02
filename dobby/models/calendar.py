@@ -1,6 +1,6 @@
 import re
 from datetime import datetime, timedelta
-from enum import Enum, Flag
+from enum import Enum
 from typing import Optional, Pattern, Union
 
 __all__ = ["EVERY", "Calendar", "Interval"]
@@ -9,8 +9,9 @@ _DEFAULT = object()
 RE_PARSER: Pattern = re.compile(r"^(@?\d+|\*)([a-zA-Z])$")
 
 
-class Interval(Flag):
-    START = 0
+class Interval(Enum):
+    START = "at_start"
+    END = "at_end"
 
 
 class ReprMap(Enum):
@@ -104,8 +105,9 @@ class Calendar:
         for interval in INTERVALS:
             value = 0
 
+            val = intervals.pop(interval, _DEFAULT)
+
             if not _found_start:
-                val = intervals.pop(interval, _DEFAULT)
                 if val is not _DEFAULT:
                     if interval == "week":
                         self.month = None
@@ -117,10 +119,13 @@ class Calendar:
                         if not intervals:
                             _found_value = True
                         value = val
-                elif interval == "week":
-                    value = None
                 elif not _found_value:
                     value = EVERY()
+
+            if val is _DEFAULT:
+                if interval == "week":
+                    value = None
+
             setattr(self, interval, value)
 
         self.month_anchor = self.month is not None

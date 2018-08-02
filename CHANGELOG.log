@@ -1,0 +1,13 @@
+// Loglette Changelog
+
+title: Internal cleansing!;
+version: 0.2.0;
+release: 2018-08-02;
+---
+
+ADDED: Changelog!;
+ADDED: Support for Carrier aliases;
+ADDED: Some more [documentation](https://deepswissvoice.github.io/Dobby/);
+CHANGED[1]: Improved [converters](https://deepswissvoice.github.io/Dobby/converter) to be much more flexible;
+CHANGED: Instead of displaying meaningless seconds, Dobby now shows sleep time in a more reasonable unit;
+FIXED[2]: The internal calendar now properly handles "monthly" tasks;

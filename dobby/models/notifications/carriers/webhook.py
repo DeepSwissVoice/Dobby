@@ -3,13 +3,14 @@ from typing import Any, Dict
 
 import requests
 
-from ..carrier import Carrier
+from ..carrier import Carrier, carrier
 from ..notification import Notification
 from ....utils import filter_dict
 
 log = logging.getLogger(__name__)
 
 
+@carrier("webhook")
 class WebhookCarrier(Carrier):
     url: str
     username: str = "Dobby"

@@ -6,18 +6,18 @@ from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo.errors import InvalidOperation
 
-from ... import Context, Converter, Group
+from ... import Context, Group, converter
 
 log = logging.getLogger(__name__)
 
 mongodb = Group(name="mongodb")
 
 
-class DatabaseConverter(Converter):
-    def convert(self, arg: Union[str, dict], **kwargs) -> Database:
-        if isinstance(arg, str):
-            return MongoClient(arg).get_database()
-        raise NotImplementedError("Not yet implemented")
+@converter(Database)
+def convert(arg: Union[str, dict], **kwargs) -> Database:
+    if isinstance(arg, str):
+        return MongoClient(arg).get_database()
+    raise NotImplementedError
 
 
 def mv_documents(from_coll: Collection, to_coll: Collection, condition: dict, projection: Union[list, dict] = None, batch_size=100) -> int:
@@ -41,17 +41,15 @@ def mv_documents(from_coll: Collection, to_coll: Collection, condition: dict, pr
 
 
 @mongodb.slave()
-def move_documents(ctx: Context, database: DatabaseConverter, from_coll: str, to_coll: str, condition: dict,
+def move_documents(ctx: Context, database: Database, from_coll: str, to_coll: str, condition: dict,
                    projection: Union[dict, list] = None) -> int:
-    database: Database
     from_coll = database[from_coll]
     to_coll = database[to_coll]
     return mv_documents(from_coll, to_coll, condition, projection)
 
 
 @mongodb.slave()
-def remove_documents(ctx: Context, database: DatabaseConverter, from_coll: str, condition: dict) -> int:
-    database: Database
+def remove_documents(ctx: Context, database: Database, from_coll: str, condition: dict) -> int:
     coll = database[from_coll]
     return coll.delete_many(condition).deleted_count
 

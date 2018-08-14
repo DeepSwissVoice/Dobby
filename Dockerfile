@@ -12,7 +12,7 @@ WORKDIR /dobby
 # INSTALL
 COPY Pipfile ./
 COPY Pipfile.lock ./
-RUN pipenv install
+RUN pipenv sync
 
 # SETUP
 COPY dobby dobby

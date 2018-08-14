@@ -14,6 +14,16 @@ _DEFAULT = object()
 
 
 class _Container(abc.ABC):
+    """Base class for `ListContainer` and `DictContainer`
+
+    Provides an access wrapper for `data` and an `Environment`.
+    When accessing an item from this Container it tries to get it from
+    the data first and if it doesn't find it there it'll get it from the
+    `Environment`.
+
+    Attributes:
+        env: Reference to the `Environment` that's used.
+    """
     env: "Environment"
 
     def __init__(self, env: "Environment", data, *args, **kwargs):
@@ -30,8 +40,14 @@ class _Container(abc.ABC):
     def __getitem__(self, item: Any) -> Any:
         return getitem(self.env, super().__getitem__(item))
 
+    @abc.abstractmethod
+    def to_normal(self):
+        """Convert this Container to its Python equivalent."""
+        pass
+
 
 class ListContainer(_Container, UserList):
+    """A list with Environment support."""
     __class__ = list
 
     data: list
@@ -49,6 +65,7 @@ class ListContainer(_Container, UserList):
 
 
 class DictContainer(_Container, UserDict):
+    """A dict with Environment support."""
     __class__ = dict
 
     data: dict
@@ -69,6 +86,15 @@ class DictContainer(_Container, UserDict):
 
 
 def getitem(env: "Environment", value: Any) -> Any:
+    """Wrap value in `Container` or resolve it if it points to an environment variable.
+
+    Args:
+        env: `Environment` to use for pointer lookups
+        value: Value to resolve
+
+    Returns:
+        The actual value
+    """
     if isinstance(value, list):
         return ListContainer(env, value)
     elif isinstance(value, dict):
@@ -81,6 +107,20 @@ def getitem(env: "Environment", value: Any) -> Any:
 
 # noinspection PyUnreachableCode
 def parse_value(value: str) -> Any:
+    """Parse a string into an object.
+
+    This function is used to parse environment variables into
+    their corresponding Python object.
+
+    Args:
+        value: String value to parse
+
+    Returns:
+        The parsed value
+
+    Raises:
+        `ValueError` when the value couldn't be parsed
+    """
     with suppress(SyntaxError, ValueError):
         return literal_eval(value)
 
@@ -96,6 +136,21 @@ class Environment(DictContainer):
         super().__init__(self, data)
 
     def __getitem__(self, item: Any) -> Any:
+        """Get the value of key *item*.
+
+        Tries to get the value from the environment variables first
+        and if it doesn't exist there it returns the value specified
+        in the `env` section of the config file.
+
+        Args:
+            item: Key to retrieve
+
+        Returns:
+            The value found
+
+        Raises:
+            `EnvError` when *item* isn't present or its value couldn't be parsed
+        """
         value = os.getenv(str(item), _DEFAULT)
         if value is not _DEFAULT:
             try:
@@ -114,8 +169,23 @@ class Environment(DictContainer):
 
 
 class Config(UserDict):
+    """The global config used by `Dobby`.
+
+    It's a `collections.UserDict` subclass specialised for Dobby.
+
+    Attributes:
+        env: `Environment` used to resolve pointers parsed
+            from the config file
+        ext: `ListContainer` of names of extensions named
+            in the config file
+        notifications: `DictContainer` holding the notification
+            configuration
+        tasks: `DictContainer` of parsed task configurations
+            from the config file
+    """
     env: Environment
     ext: ListContainer
+    notifications: DictContainer
     tasks: DictContainer
 
     def __init__(self, env: Environment, ext: ListContainer, notifications: DictContainer, tasks: DictContainer, data: DictContainer):
@@ -127,6 +197,16 @@ class Config(UserDict):
 
     @classmethod
     def load(cls, fp: Path) -> "Config":
+        """Build a `Config` instance from a `pathlib.Path`.
+
+        Parses the YAML contents of the file and constructs a `Config`.
+
+        Args:
+            fp: `pathlib.Path` to read data from
+
+        Returns:
+            `Config` based on *fp*
+        """
         config = yaml.load(fp.read_text())
         env = Environment(config.pop("env", None))
 

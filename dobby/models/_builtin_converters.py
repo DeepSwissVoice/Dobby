@@ -1,7 +1,9 @@
+"""This module holds the `Converters <Converter>` that Dobby supports natively."""
+
 from typing import Any
 
+from dobby.config import DictContainer, ListContainer
 from .converter import converter
-from ..config import DictContainer, ListContainer
 
 
 @converter(dict)

@@ -6,7 +6,7 @@ from typing import Any, Dict
 import requests
 from requests import Response
 
-from .. import Context, Group, slave
+from dobby import Context, Group, slave
 
 log = logging.getLogger(__name__)
 

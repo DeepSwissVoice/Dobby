@@ -1,11 +1,11 @@
 import logging
 from typing import TYPE_CHECKING
 
-from .. import Context, Group
-from ..utils import find_extensions
+from dobby import Context, Group
+from dobby.utils import find_extensions
 
 if TYPE_CHECKING:
-    from .. import Dobby
+    from dobby import Dobby
 
 log = logging.getLogger(__name__)
 

@@ -9,6 +9,15 @@ log = logging.getLogger(__name__)
 
 
 class Manager:
+    """Manages the notification system for Dobby.
+
+    Attributes:
+        carriers: A List of all `Carrier` instances that are used by this Manager.
+
+    Args:
+        carriers: Optional list of `Carriers` to use
+    """
+
     carriers: List[Carrier]
 
     def __init__(self, carriers: List[Carrier] = None):
@@ -16,6 +25,14 @@ class Manager:
 
     @classmethod
     def load(cls, config: dict) -> "Manager":
+        """Builds a Manager instance based on a configuration found in the config file.
+
+        Args:
+            config: A dictionary containing the configuration for notifications
+
+        Returns:
+            Manager instance
+        """
         inst = cls()
 
         for key, value in config.items():
@@ -35,6 +52,11 @@ class Manager:
         return inst
 
     def send(self, notification: Notification):
+        """Send a `Notification` to all `Carrier` instances.
+
+        Args:
+            notification: `Notification` to send
+        """
         for carrier in self.carriers:
             exc = None
 

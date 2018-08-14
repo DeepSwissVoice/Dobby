@@ -17,6 +17,8 @@ CARRIER_MAP = {}
 
 
 class Carrier(abc.ABC):
+    """Delivers Notifications"""
+
     def __init__(self, manager: "Manager", options: dict):
         self.manager = manager
         self.options = options
@@ -42,14 +44,35 @@ class Carrier(abc.ABC):
         return f"<{type(self).__name__}>"
 
     def init(self):
+        """Convenience function called after __init__.
+
+        You can override this in subclasses to do whatever you want
+        """
         pass
 
     @abc.abstractmethod
     def deliver(self, notification: Notification) -> bool:
+        """Do whatever is necessary to send the notification to the destination.
+
+        Args:
+            notification: The `Notification` to deliver
+
+        Returns:
+            A boolean indicating whether the delivery was successful
+        """
         pass
 
 
 def register_carrier(_carrier: Type[Carrier], aliases: Iterable[str]) -> Type[Carrier]:
+    """Register a `Carrier` class for the given aliases
+
+    Args:
+        _carrier: `Carrier` class to register
+        aliases: Names to associate with this `Carrier`
+
+    Returns:
+        Just returns the `Carrier` class you passed for convenience
+    """
     if not issubclass(_carrier, Carrier):
         raise SetupError(f"Carrier must be a subclass of Carrier, not {type(_carrier)}",
                          hint="Make sure your Carriers derive from the class \"Carrier\"!")
@@ -64,9 +87,22 @@ def register_carrier(_carrier: Type[Carrier], aliases: Iterable[str]) -> Type[Ca
 
 
 def carrier(*aliases: str):
+    """Mark a class as a `Carrier` for the given aliases.
+
+    Args:
+        aliases: Names this Carrier should be using
+    """
     return partial(register_carrier, aliases=aliases)
 
 
 def find_carrier(name: str) -> Optional[Type[Carrier]]:
+    """Find a `Carrier` based on its name
+
+    Args:
+        name: Name to look for
+
+    Returns:
+        `Carrier` class or None if there's no `Carrier` with that name
+    """
     name = name.lower()
     return CARRIER_MAP.get(name)

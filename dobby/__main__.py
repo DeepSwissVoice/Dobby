@@ -35,7 +35,9 @@ def test(args: Namespace):
     dobby.test()
 
 
-def main():
+def main(*args):
+    args = args or None
+
     parser = ArgumentParser("dobby")
     subparsers = parser.add_subparsers(title="commands")
 
@@ -47,7 +49,7 @@ def main():
     run_parser.add_argument("config_file", type=Path)
     run_parser.set_defaults(func=test)
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     args.func(args)
 
 

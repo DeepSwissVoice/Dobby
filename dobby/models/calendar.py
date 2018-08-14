@@ -50,6 +50,14 @@ PRESETS = [
 
 
 def find_preset(key: str) -> Optional[dict]:
+    """Find a preset based on the key
+
+    Args:
+        key: name of the preset
+
+    Returns:
+        The dict configuration of the preset or None
+    """
     key = key.lower()
     return next((value for keys, value in PRESETS if key in keys), None)
 

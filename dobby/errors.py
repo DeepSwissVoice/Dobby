@@ -5,8 +5,23 @@ if TYPE_CHECKING:
 
 DobbyBaseError = type("DobbyBaseError", (Exception,), {})
 
+DobbyBaseError.__doc__ = """This exception is just a subclass of `Exception`.
+
+It doesn't add any extra functionality but it's supposed to be the only error ever
+raised by Dobby.
+"""
+
 
 class DobbyError(DobbyBaseError):
+    """
+    A base class for all Dobby-related errors that provide a bit more info.
+    A `DobbyError` can help you fix the problem by giving a (useless) hint and the `Context`
+    in which the error was raised.
+
+    Attributes:
+        ctx: `Context` that was passed to the error (optional)
+    """
+
     _msg: str
     _hint: Optional[str]
     ctx: Optional["Context"]
@@ -36,24 +51,51 @@ class DobbyError(DobbyBaseError):
 
     @property
     def msg(self) -> str:
+        """Formatted message that was passed to the error."""
         return self._format_str(self._msg)
 
     @property
     def hint(self) -> Optional[str]:
+        """The hint which may have been provided when creating the error."""
         if self._hint:
             return self._format_str(self._hint)
 
     @property
     def message(self) -> Optional[str]:
+        """A property for subclasses to override.
+        For `DobbyError` this will always be `None`.
+
+        If the message is a truthy value then it'll be included in the string representation
+        of the error.
+        """
         return None
 
 
 SetupError = type("SetupError", (DobbyError,), {})
 
+SetupError.__doc__ = """
+A subclass of `DobbyError` which really doesn't add anything to the base class **but**
+it is (or at least should be) the base class for all errors that happen during the setup of
+Dobby (that's basically everything before going to sleep to wait for the first task).
+"""
+
 EnvError = type("EnvError", (SetupError,), {})
+
+EnvError.__doc__ = """
+Finally we get to the first *real* error which is raised when trying to access a key from
+the `env` that isn't defined in the environment variables or the `env` config key.
+"""
 
 
 class ConversionError(SetupError):
+    """Raised when the conversion of a config value to the designated slave argument type fails.
+
+    Attributes:
+        key: Name of the parameter that the `value` was supposed to be converted for
+        value: Value that was passed to the `Converter` to be converted
+        converter: `Converter` that tried to convert the `value`
+    """
+
     key: str
     value: Any
     converter: Callable
@@ -66,6 +108,10 @@ class ConversionError(SetupError):
 
     @property
     def message(self) -> str:
+        """
+        A string which provides information on which `Converter` was used,
+        what was to be converted and for which slave argument.
+        """
         lines = []
         if self.converter:
             lines.append(f"Converter: {self.converter}")

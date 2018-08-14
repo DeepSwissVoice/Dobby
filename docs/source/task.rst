@@ -35,7 +35,7 @@ Report
 ------
 
 A task can create a report after running all the jobs and send it using
-the configured ref:`carrier-guide`.
+the configured :ref:`Carrier <carrier-guide>`.
 
 .. _job-guide:
 

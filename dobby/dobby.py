@@ -5,7 +5,9 @@ from operator import attrgetter
 from pathlib import Path
 from typing import Dict, List, Union, overload
 
-from . import Config, Context, GroupMixin, Task, __version__, slaves
+from . import __version__, slaves
+from .config import Config
+from .models import Context, GroupMixin, Task
 from .models.notifications import Notification, NotificationManager
 from .utils import human_timedelta, setup_sentry
 

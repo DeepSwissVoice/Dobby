@@ -9,7 +9,7 @@ from ..converter import convert
 from ...errors import SetupError
 
 if TYPE_CHECKING:
-    from .manager import Manager
+    from .manager import NotificationManager
 
 log = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ CARRIER_MAP = {}
 class Carrier(abc.ABC):
     """Delivers Notifications"""
 
-    def __init__(self, manager: "Manager", options: dict):
+    def __init__(self, manager: "NotificationManager", options: dict):
         self.manager = manager
         self.options = options
 

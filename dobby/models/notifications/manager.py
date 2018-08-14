@@ -8,7 +8,7 @@ from ...errors import SetupError
 log = logging.getLogger(__name__)
 
 
-class Manager:
+class NotificationManager:
     """Manages the notification system for Dobby.
 
     Attributes:
@@ -24,7 +24,7 @@ class Manager:
         self.carriers = carriers or []
 
     @classmethod
-    def load(cls, config: dict) -> "Manager":
+    def load(cls, config: dict) -> "NotificationManager":
         """Builds a Manager instance based on a configuration found in the config file.
 
         Args:

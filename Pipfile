@@ -10,6 +10,7 @@ python_version = "3.7"
 pytest = "*"
 pytest-cov = "*"
 loglette = "*"
+sphinx = "*"
 
 [packages]
 colorlog = "*"

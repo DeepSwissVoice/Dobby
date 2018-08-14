@@ -9,3 +9,4 @@ from .models import *
 from .models.notifications import Carrier
 from .dobby import Dobby
 from .errors import *
+from .config import Config

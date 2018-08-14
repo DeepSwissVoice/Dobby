@@ -6,7 +6,7 @@ from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo.errors import InvalidOperation
 
-from ... import Context, Group, converter
+from dobby import Context, Group, converter
 
 log = logging.getLogger(__name__)
 

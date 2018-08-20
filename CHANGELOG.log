@@ -1,17 +1,26 @@
 // Loglette Changelog
 
-version: 0.2.1;
-release: 2018-08-14;
--------
 
-ADDED: some code documentation;
+version: 0.2.1-dev;
+release: unreleased;
+-------------------
 
+ADDED: Error handling for reports;
 =============================
 
-title: Internal cleansing!;
+
+version: 0.2.1;
+release: 2018-08-14;
+-------------------
+
+ADDED: some code documentation;
+==============================
+
+
 version: 0.2.0;
+title: Internal cleansing!;
 release: 2018-08-02;
--------
+-------------------
 
 ADDED: Changelog!;
 ADDED: Support for Carrier aliases;

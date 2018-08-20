@@ -6,8 +6,10 @@ from typing import List, TYPE_CHECKING
 from .calendar import Calendar
 from .context import Context
 from .job import Job
+from .notifications import Notification
 from .report import Report
 from ..config import DictContainer
+from ..errors import ReportError
 
 if TYPE_CHECKING:
     from .. import Dobby
@@ -73,8 +75,15 @@ class Task:
             results[job.jobname] = job_ctx
 
         if self.report.should_report(ctx, results):
-            notification = self.report.create(ctx, results)
+            try:
+                notification = self.report.create(ctx, results)
+            except ReportError as e:
+                log.warning(f"Something went wrong while creating the report for {self}", exc_info=e)
+                notification = Notification.from_exception(e)
+
             self.dobby.send_notification(notification)
+        else:
+            log.info(f"not reporting {self} because check failed")
 
     def execute_if_due(self, time: datetime, ctx: Context):
         if self.next_execution > time:

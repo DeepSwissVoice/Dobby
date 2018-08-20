@@ -12,6 +12,53 @@ raised by Dobby.
 """
 
 
+class DobbyRuntimeError(DobbyBaseError):
+    """This exception is used for errors during runtime of Dobby."""
+
+    _msg: str
+    ctx: "Context"
+
+    def __init__(self, msg: str, **kwargs):
+        self._msg = msg
+        self.ctx = kwargs.pop("ctx", None)
+        super().__init__(**kwargs)
+
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}({self.msg!r})"
+
+    @property
+    def format_args(self) -> dict:
+        return dict(msg=self._msg, ctx=self.ctx, self=self)
+
+    @property
+    def msg(self) -> str:
+        """Formatted message that was passed to the error."""
+        return self._msg.format(**self.format_args)
+
+
+class ReportError(DobbyRuntimeError):
+    """For errors relating to task reports.
+
+    Keyword Args:
+        original: `Exception` that originally occurred.
+    """
+
+    original: Exception
+
+    def __init__(self, msg: str, **kwargs):
+        self.original = kwargs.pop("original")
+        super().__init__(msg, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{type(self.original).__name__}: {', '.join(self.original.args)}"
+
+    @property
+    def format_args(self):
+        args = super().format_args
+        args["original"] = self.original
+        return args
+
+
 class DobbyError(DobbyBaseError):
     """
     A base class for all Dobby-related errors that provide a bit more info.

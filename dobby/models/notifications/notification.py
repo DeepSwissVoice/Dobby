@@ -75,8 +75,15 @@ class Embed(_Container):
 class Notification(_Container):
     def __init__(self, *embeds, **kwargs):
         self.text = kwargs.get("text")
-        self.embeds = list(map(unwrap(Embed), embeds or kwargs.get("embeds", [])))
+        _embeds = embeds or kwargs.get("embeds", [])
+        self.embeds = []
+        for embed in _embeds:
+            if not isinstance(embed, Embed):
+                embed = Embed(**embed)
+            self.embeds.append(embed)
 
     @classmethod
     def from_exception(cls, exc: Exception) -> "Notification":
-        pass
+        exc_type = type(exc)
+        embed = Embed(title=exc_type.__name__, text=str(exc), level=ColorLevel.ERROR)
+        return cls(embed, text="There was an error:")

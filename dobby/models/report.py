@@ -2,6 +2,7 @@ from typing import Any, Dict, Optional, Union
 
 from .context import Context
 from .notifications import Notification
+from ..errors import ReportError
 
 _DEFAULT = object()
 
@@ -86,10 +87,13 @@ class Report:
         return kwargs
 
     def render(self, **kwargs) -> Notification:
-        return self.template.format_all(**kwargs)
+        try:
+            return self.template.format_all(**kwargs)
+        except Exception as e:
+            raise ReportError("Something went wrong while rendering the report", original=e)
 
     def should_report(self, ctx: Context, results: Dict[str, Context]) -> bool:
-        return bool(self.template)
+        return bool(self.template) and any(ctx.result for ctx in results.values())
 
     def create(self, ctx: Context, results: Dict[str, Context]) -> Notification:
         kwargs = self.prepare_context(ctx, results)
